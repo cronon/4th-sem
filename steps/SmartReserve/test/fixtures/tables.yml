@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  seats: 1
+  belongs_to: 
+  has_many: 
+
+two:
+  seats: 1
+  belongs_to: 
+  has_many: 

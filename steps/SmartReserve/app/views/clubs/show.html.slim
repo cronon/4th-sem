@@ -1,0 +1,16 @@
+p#notice= notice
+p
+  strong Name:
+  = @club.name
+p
+  strong Description:
+  = @club.description
+p
+  strong Avatar url:
+  = @club.avatar_url
+p
+  strong Average price:
+  = @club.average_price
+= link_to 'Edit', edit_club_path(@club)
+| \
+| \#{link_to 'Back', clubs_path}
