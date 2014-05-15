@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140510163608) do
+ActiveRecord::Schema.define(version: 20140511193311) do
 
   create_table "clubs", force: true do |t|
     t.string   "name"
@@ -25,10 +25,11 @@ ActiveRecord::Schema.define(version: 20140510163608) do
   create_table "orders", force: true do |t|
     t.string   "name"
     t.string   "phone"
-    t.integer  "club_id"
-    t.integer  "table_id"
+    t.datetime "datetime"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "confirmation_code"
+    t.boolean  "confirmed"
   end
 
   create_table "tables", force: true do |t|
