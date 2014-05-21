@@ -655,6 +655,7 @@ Use 'bundle show [gemname]' to see where a bundled gem is installed.
 ```
 В последней строчке трассировка запуска показывает, что мы только что запустили веб-сервер с использованием порта 3000. Мы можем получить доступ к приложению, указав веб-браузеру URL-адрес http://localhost:3000. Результат показан на рис. 2
 ![fig. 2](2 development/fig.2.png)
+_Рис. 2_
 
 
 
@@ -709,10 +710,13 @@ SmartReserve> rake db:migrate
 ```
 Подключимся к серверу (рис. 3)
 ![fig.3](2 development/fig.3.png)
+_Рис. 3_
 Список заведений пуст. Перейдем по ссылке New Club и добавим что-нибудь (рис. 4)
 ![fig.4](2 development/fig.4.png)
+_Рис. 4_
 Щелкнем по кнопке Create и видим, что новая запись успешно сохранена (рис. 5)
 ![fig.5](2 development/fig.5.png)
+_Рис. 5_
 Эти формы были сгенерированы автоматически. Они лежат в `/app/views/clubs`.
 ```html
 <!-- app/views/clubs/index.html.erb - список заведений-->
@@ -875,6 +879,7 @@ br/
 ```
 Убедимся, что новые стили подключились (рис. 6)
 ![fig.6](2 development/fig.6.png)
+_Рис. 6_
 
 ## 2.5 Модели
 ### Столик
@@ -914,7 +919,8 @@ end
 и заведения `app/models/club.rb`
 ```ruby
 class Club < ActiveRecord::Base
-  has_many :tables # генерирует метод Club#tables, который будет возвращать коллекцию столиков ресторана
+  # генерирует метод Club#tables, который будет возвращать коллекцию столиков ресторана
+  has_many :tables 
 end
 ```
 Проведем миграцию
@@ -1010,8 +1016,7 @@ SmartReserve> rake db:migrate
                 Для каждого из параметров существует диалоговое окно
                 В Bootstrap уже есть готовые стили и скрипты для диалоговых окон
               label Интерьер 
-              / Атрибут data-toggle="modal" говорит, что клик по ссылке вызовет диаоговое окно
-                с id указанным в data-target="#interior_modal" -- в этом случае "interior_modal"
+              / Атрибут data-toggle="modal" говорит, что клик по ссылке вызовет диаоговое окно с id указанным в data-target -- в этом случае "interior_modal"
               a.align-right[href='#' onclick='' data-toggle="modal" data-target="#interior_modal"]  Выбрать
 
               / Так как у нас три одинаковых окна, различающиеся только содержимым, код окна вынесен в отдельный файл -- 
@@ -1034,6 +1039,11 @@ SmartReserve> rake db:migrate
               #features
                 / Шесть первых особенностей видны на форме
                 - Feature.limit(6).each do |property|
+                  / хелпер для <input type="checkbox">
+                  / первый параметр задает атрибут name
+                  / второй -- value
+                  / третий -- checked
+                  / четвертый -- хэш со всеми остальными атрибутами
                   = check_box_tag 'property_ids[]', property.id, @checked_properties.include?(property.id), :class => 'styled'
                   = property.name
                   br/
@@ -1071,7 +1081,50 @@ SmartReserve> rake db:migrate
 
           / в переменной @clubs содержатся найденные заведения
           - @clubs.each do |club|
-              == render 'clubs/single_catalog', :club => club
+              == render 'clubs/single_club', :club => club
+
+/ app/views/clubs/_modal_with_checkboxes.html.slim
+/ по соглашению имена файлов с парциаами начинаются с подчеркивания
+.modal.fade id="#{id}" aria-hidden="true" aria-labelledby="features_modalLabel" role="dialog" tabindex="-1" 
+  .modal-dialog
+    .modal-content
+      .modal-header
+        / кнопка для закрытия диалогового окна
+        button.close aria-hidden="true" data-dismiss="modal" type="button"  &times;
+        h4#myModalLabel.modal-title.red[style='text-align:center'] Особенности заведения
+      .modal-body.row
+        / выстроим все параметры в две колонки
+        - properties.each_slice((properties.size/2.0).round) do |half|
+          .col-md-6
+            - half.each do |property|         
+              = check_box_tag 'property_ids[]', property.id, checked_properties.include?(property.id),:class=>'styled'
+              label = property.name
+              br/
+      .modal-footer style="text-align:center"
+        button.btn.btn-red-border style="padding-top:5px" data-dismiss="modal" type="button" Отмена
+        button.btn.btn-red-border style="padding-top:5px" data-dismiss="modal" type="button" ОК
+
+/ app/views/clubs/_single_club.html.slim
+.club-wrapper-catalog
+  .club-div style="background-image:url(#{club.avatar_url})" 
+    .white-on-avatar style='height:50px;margin-top:15px;overflow-x:hidden'
+      / club_path возвращает ссылку на страницу заведения
+      / Например, club_path(1) => /clubs/1
+      a.title-on-avatar href="#{club_path(club)}" 
+        = club.name
+      .address-on-avatar
+        = club.get_address
+    .white-on-avatar style="height:35px;margin-top:95px;"
+      .rating
+        / все картинки хранятся в папке app/assets/images
+        / чтобы получить путь к картинке используется метод asset_path
+        img.rating-img src="#{asset_path('ajaxful_rating/big_star.png')}"
+        span.rating-value
+          = club.rating_average
+      span.reservation-btn-wrapper
+        / club_new_order_path возвращает ссылку на странцу оформления брони
+        / Например, club_new_order_path(1) => /clubs/1/orders/new
+        = link_to 'Забронировать',  club_new_order_path(club), :class=>'btn-reservation btn btn-danger'
 ```
 ```scss
 /* app/assets/stylesheets/clubs.css.scss.erb */
@@ -1183,6 +1236,7 @@ h3{
 ```
 Теперь наша страница выглядит гораздо лучше (рис. 7)
 ![fig.7](2 development/fig.7.png)
+_Рис. 7_
 
 ## 2.7 Заказы
 После оформления заказа запрашивается код подтверждения, который присылается на указанный пользователем номер телефона. Реализуем эту логику.
@@ -1278,7 +1332,7 @@ class OrdersController < ApplicationController
     end
 
     # Не стоит доверять всему, что пришло из интернета. 
-    # Метод оставит хэше params только указанные параметры.
+    # Метод оставит в хэше params только указанные параметры.
     def order_params
       params.require(:order).permit(:name, :phone, :time, :user_confirmation, :table_id)
     end
@@ -1286,7 +1340,7 @@ end
 ```
 Добавим представление
 ```scss
-# app/views/orders/new.html.slim
+/ app/views/orders/new.html.slim
 .col-md-8.col-md-offset-2
   h2[style='font-weight:bold'] Бронирование
   #orders_form.content
@@ -1306,9 +1360,276 @@ end
             span#succes_time / а сюда - время
           div style="text-align:center"
             a.btn.btn-primary href="home" data-dismiss="modal" type="button" ОК
+
+/ app/views/orders/_form.html.slim
+.row
+  / если в хэлпер form_for передать объект, то все поля формы будт ассоциированы с ним
+  = form_for(@order, url: club_orders_path, :method=>:post) do |f|
+    .col-md-8
+      #tables_list
+        = render "tables/list"
+    .col-md-4
+      .order-inputs
+        label[style='font-weight:bold'] Введите ваши данные:
+        / если в @order есть ошибки, они выведутся именно здесь
+        - if @order.errors.any?
+          #error_explanation
+            ul
+              - @order.errors.full_messages.each do |msg|
+                li = msg
+        table
+          tr
+            td 
+              = f.label :name
+            td 
+              / такой метод выполнит то же, что и 
+                input type="text" name="order[name]" value="#{@order.name}"
+                Кроме того, если ошибка будет указывать на свойство name, поле обернется в div с классом field_with_errors
+              = f.text_field :name
+          tr  
+            td 
+              = f.label :phone
+            td 
+              = f.telephone_field :phone
+          tr  
+            td
+              = f.label :comment
+            td 
+              = f.text_area :comment
+          tr
+            td
+            td
+              .actions
+                = f.submit 'Забронировать', :remote => true
+
+/ app/views/tables/_list.html.slim
+.tables-list
+  .tables-inputs
+    .current-time
+      label> Текущая дата и время:
+      = Time.now.strftime('%d.%m.%Y %H:%M')
+      / showCurrentState() осуществляет AJAX-запрос и отображает ситуацию на текущий момент
+      a[style='float:right;cursor:pointer' onclick="showCurrentState()"] Отобразить на текущий момент
+    .row: col-md-12: br
+    div[style="height:20px"]
+      .date-inputs
+        label Выберите дату 
+        input#datepicker name="date"
+      .time-inputs 
+        div
+        label Выберите время 
+        .time-select: select[name='hour']
+          - ('00'..'23').each do |k|
+            option[value=k name='hour'] = k
+        .time-select: select[name='minute']
+          - ('00'..'55').step(5) do |k|
+              option[value=k name='minute'] = k
+
+  #tables_schema
+    #tables_radios
+      - @tables.each do |table|
+        .table-cell
+          / Настоящие radio спрятаны под изображением столика
+          / По клику на изображение оно меняется и выбирается соответствующий radio
+          .table-wrapper[onclick="onTableClick(this)"]
+            = radio_button_tag "order[table_id]", "#{table.id}", @table_id==table.id   
+            / get_table_color возвращает класс для столика цвета соответствующего его состоянию:
+              красный -- занят
+              желтый -- забронирован
+              зеленый -- свободен       
+            div[class="table #{get_table_color(table, @time)} #{'active' if @table_id == table.id}"]
+              .table-number
+                = table.number
+            .chair
+              .chair-number
+                = table.seats
+    #tables_legend
+      .row
+        .col-xs-4
+          / класс для кружков разных цветов
+          span.circle.circle-free 
+          |   Свободно  
+        .col-xs-4
+          span.circle.circle-booked 
+          |   Забронироано  
+        .col-xs-4
+          span.circle.circle-busy 
+          |   Занято
+
+```
+```scss
+/* app/assets/stylesheets/tables.css.scss.erb */
+.table-free{
+  background-color:#2ecc71
+}
+.table-busy{
+  background-color: #ec5c5c;
+}
+.table-booked{
+  background-color: #f1c40f;
+}
+
+.circle{
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  border-radius: 30px;
+  position: relative;
+  top: 10px;
+}
+.circle-free{
+  background-color:#2ecc71
+}
+.circle-busy{
+  background-color: #ec5c5c;
+}
+.circle-booked{
+  background-color: #f1c40f;
+}
+.tables-list{
+
+  font-size: 15px;
+
+  #tables_schema{
+    border: 3px solid #ec5c5c;
+    border-radius: 5px;
+
+    #tables_radios{
+      color: #ec5c5c;
+      font-weight: bold;
+      display: table;
+    }
+
+    .table-cell{
+      padding-left: 35px;
+      padding-top: 25px;
+      float:left;
+      display: table-cell;
+      cursor:pointer;
+
+      input{
+        display: none;
+      }
+    }
+    .table-wrapper{
+      position:relative;
+      width:130px;
+      height: 120px;
+    }
+    .table{
+      width: 100px;
+      height: 100px;
+      background-image: url('<%= asset_path("tables/table1.png") %>');
+      background-repeat: no-repeat;
+      background-position: 14px 24px;
+      border-radius: 50px;
+      position:relative;
+      .table-number{
+        position:absolute;
+        top: 42px;
+        left: 39px;
+        width: 20px;
+        text-align: center;
+      }
+    }
+    .table.active{
+        -webkit-box-shadow: 0px 0px 100px 10px #00ff6c;
+        -moz-box-shadow:    0px 0px 100px 10px #00ff6c;
+        box-shadow:         0px 0px 100px 10px #00ff6c;
+    }
+
+    .chair{
+      width:40px;
+      height:60px;
+      background-image: url('<%= asset_path("tables/chair.png") %>');
+      position: absolute;
+      bottom: 0px;
+      right: 0px;
+      .chair-number{
+        position: absolute;
+        position: absolute;
+        left: 17px;
+        width: 18px;
+        text-align: center;
+      }
+    }
+    
+
+    #tables_legend {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  }
+
+  .tables-inputs{
+    label{
+      display:inline;
+      font-size: 15px;
+    }
+    a{
+      text-decoration: underline;
+    }
+    .date-inputs{
+      float:left;
+    }
+    .time-inputs{
+      float:right;
+      display:inline-flex;
+    }
+    .time-select{
+      padding-left:5px;
+      width:70px;
+    }
+    .selectize-control{
+      width:100%;
+    }
+  }
+}
+
+/* app/assets/stylesheets/orders.css.scss */
+div > .btn-red-border {
+  background-color: #ffffff;
+  border-color: #ec5c5c;
+  border-width:2px;
+  color: #ec5c5c;
+  height: 36px;
+  font-size:18px;
+  height:50px;
+  padding-top: 10px;
+}
+.btn-red-border > a{
+  color:#ec5c5c;
+  vertical-align: middle;
+}
+.btn-red-border > a:hover{
+  color:#ec5c5c;
+  text-decoration: none;
+}
+
+#orders_form{
+  border: 3px solid #ec5c5c;
+  padding: 40px;
+  padding-top: 30px;
+}
+.order-inputs{
+  input{
+    width:100%;
+  }
+  textarea{
+    width:100%;
+  }
+  td{
+    padding: 1px;
+    padding-right: 5px;
+  }
+  #submit_form{
+    width:100%;
+  }
+}
 ```
 Результаты на рис. 8
 ![fig.8](2 development/fig.8.png)
+_Рис. 8_
 
 ## ЗАКЛЮЧЕНИЕ
 В ходе выполнения курсовой работы было создано полнофункциональное веб-приложение, полностью готовое к использованию. Сервис SmartReserve предоставляет возможность бронирования столиков в заведениях города в режиме онлайн в течение нескольких мгновений. С его помощью пользователи могут организовать свой досуг или деловую встречу, без дорогостоящих звонков и ожиданий на телефонной линии.
