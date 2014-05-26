@@ -5,7 +5,7 @@
 4. jQuery [Электронный ресурс]. – Электронные данные. – Режим доступа: http://jquery.com/
 5. Bootstrap [Электронный ресурс]. – Электронные данные. – Режим доступа: http://getbootstrap.com/
 6. CSS-Tricks [Электронный ресурс]. – Электронные данные. – Режим доступа: http://css-tricks.com/
-7. Ruby on Rail API [Электронный ресурс]. – Электронные данные. – Режим доступа: http://api.rubyonrails.org/
+7. Ruby on Rails API [Электронный ресурс]. – Электронные данные. – Режим доступа: http://api.rubyonrails.org/
 8. Ruby on Rails Guides [Электронный ресурс]. – Электронные данные. – Режим доступа: http://guides.rubyonrails.org/
 9. Ruby-Doc.org [Электронный ресурс]. – Электронные данные. – Режим доступа: http://www.ruby-doc.org/
 10. APIdock [Электронный ресурс]. – Электронные данные. – Режим доступа: http://apidock.com/
