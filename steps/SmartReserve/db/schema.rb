@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141130165612) do
+ActiveRecord::Schema.define(version: 20141130102931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,11 +29,12 @@ ActiveRecord::Schema.define(version: 20141130165612) do
     t.string  "web_site"
     t.string  "metro"
     t.string  "email"
-    t.integer "user_id"
+    t.integer "owner_id"
     t.integer "category_id"
   end
 
   add_index "clubs", ["category_id"], name: "index_clubs_on_category_id", using: :btree
+  add_index "clubs", ["owner_id"], name: "index_clubs_on_owner_id", using: :btree
 
   create_table "comments", force: true do |t|
     t.text     "content"
@@ -77,6 +78,7 @@ ActiveRecord::Schema.define(version: 20141130165612) do
   add_index "rates", ["user_id"], name: "index_rates_on_user_id", using: :btree
 
   create_table "rating_types", force: true do |t|
+    t.string "name"
   end
 
   create_table "subscribes", force: true do |t|

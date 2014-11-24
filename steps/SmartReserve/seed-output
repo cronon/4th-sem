@@ -1,0 +1,123 @@
+-- создание пользователей
+(0.3ms)  BEGIN
+  SQL (0.3ms)  INSERT INTO "users" ("email", "name", "password") 
+  VALUES ($1, $2, $3) RETURNING "id"  
+  [["email", "alex@alivance.com"], ["name", "Alex"],
+   ["password", "123456"]]
+(58.2ms)  COMMIT
+(0.2ms)  BEGIN
+  SQL (0.3ms)  INSERT INTO "users" ("email", "name", "password") 
+  VALUES ($1, $2, $3) RETURNING "id"  
+  [["email", "bob@alivance.com"], ["name", "Bob"],
+   ["password", "Qwerty12"]]
+(62.2ms)  COMMIT
+(0.2ms)  BEGIN
+  SQL (0.2ms)  INSERT INTO "users" ("email", "name", "password") 
+  VALUES ($1, $2, $3) RETURNING "id"  
+  [["email", "alice@alivance.com"], ["name", "Alice"],
+   ["password", "EbMNk44"]]
+(19.7ms)  COMMIT
+(0.0ms)  BEGIN
+  SQL (0.6ms)  INSERT INTO "users" ("email", "name", "password") 
+  VALUES ($1, $2, $3) RETURNING "id"  
+  [["email", "eve@alivance.com"], ["name", "Eve"],
+   ["password", "![dwMk]}654iEydbPcdd#"]]
+(34.7ms)  COMMIT
+
+-- выбор пользователей по имени
+User Load (0.7ms)  SELECT  "users".* FROM "users"  
+  WHERE "users"."name" = 'Alex'  
+  ORDER BY "users"."id" ASC LIMIT 1
+User Load (0.3ms)  SELECT  "users".* FROM "users"  
+  WHERE "users"."name" = 'Bob'  
+  ORDER BY "users"."id" ASC LIMIT 1
+User Load (0.2ms)  SELECT  "users".* FROM "users"  
+  WHERE "users"."name" = 'Alice'  
+  ORDER BY "users"."id" ASC LIMIT 1
+
+-- создание категорий
+(0.1ms)  BEGIN
+  SQL (0.3ms)  INSERT INTO "categories" ("name") VALUES ($1) 
+  RETURNING "id"  [["name", "Бар"]]
+(41.7ms)  COMMIT
+(0.1ms)  BEGIN
+  SQL (0.2ms)  INSERT INTO "categories" ("name") VALUES ($1) 
+  RETURNING "id"  [["name", "Кафе"]]
+(41.0ms)  COMMIT
+
+-- выбор категории по имени
+Category Load (1.7ms)  SELECT  "categories".* FROM "categories"
+  WHERE "categories"."name" = 'Кафе'  
+  ORDER BY "categories"."id" ASC LIMIT 1
+
+-- создание типов рейтинга
+(0.4ms)  BEGIN
+  SQL (0.4ms)  INSERT INTO "rating_types" ("name") VALUES ($1)
+  RETURNING "id"  [["name", "Сервис"]]
+(51.7ms)  COMMIT
+(0.1ms)  BEGIN
+  SQL (0.9ms)  INSERT INTO "rating_types" ("name") VALUES ($1)
+  RETURNING "id"  [["name", "Кухня"]]
+(64.1ms)  COMMIT
+
+-- выбор типа рейтинга по имени
+RatingType Load (0.6ms)  SELECT  "rating_types".* FROM "rating_types"
+  WHERE "rating_types"."name" = 'Кухня'
+  ORDER BY "rating_types"."id" ASC LIMIT 1
+
+-- создание заведений в отдельной транзакции
+(0.2ms)  BEGIN
+  SQL (0.4ms)  INSERT INTO "clubs" 
+    ("address", "category_id", "description", "email", "name",
+     "owner_id", "photo", "web_site")
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"
+     [["address", "ул. Ленина, д. 0"], ["category_id", 2],
+      ["description", "Описание"], ["email", "club0@alivance.com"],
+      ["name", "Club0"], ["owner_id", 1],
+      ["photo", "http://smartreserve.by/assets/img/default-photo.png"],
+      ["web_site", "http://example.com"]]
+
+  -- создание столиков
+  SQL (0.3ms)  INSERT INTO "tables" ("club_id", "seats")
+    VALUES ($1, $2) RETURNING "id"  
+    [["club_id", 1], ["seats", 5]]
+
+  -- создание заказов  
+  SQL (0.3ms)  INSERT INTO "orders" 
+    ("confirmation", "table_id", "time", "user_id")
+    VALUES ($1, $2, $3, $4) RETURNING "id"
+    [["confirmation", "1234"], ["table_id", 1],
+     ["time", "2014-11-24 03:58:31.167403"], ["user_id", 2]]
+  
+  -- и так далее двадцать раз
+
+  -- создание новости
+  SQL (0.3ms)  INSERT INTO "news" 
+    ("club_id", "content", "created_at", "title")
+    VALUES ($1, $2, $3, $4) RETURNING "id"  
+    [["club_id", 127], ["content", "Мы открылись"],
+     ["created_at", "2014-11-24 03:58:31.218141"],
+     ["title", "Мы открылись"]]
+
+  -- создание подписки
+  SQL (0.2ms)  INSERT INTO "subscribes" ("club_id", "user_id")
+    VALUES ($1, $2) RETURNING "id"
+    [["club_id", 127], ["user_id", 3]]
+
+  -- создание оценки
+  SQL (0.4ms)  INSERT INTO "rates" ("club_id", "stars", "user_id")
+    VALUES ($1, $2, $3) RETURNING "id"  
+    [["club_id", 127], ["stars", 5], ["user_id", 3]]
+
+  -- создание комментария
+  SQL (0.3ms)  INSERT INTO "comments" 
+    ("club_id", "content", "created_at", "user_id")
+    VALUES ($1, $2, $3, $4) RETURNING "id"  
+    [["club_id", 127], ["content", "First comment"],
+     ["created_at", "2014-11-24 03:58:31.247139"],
+     ["user_id", 3]]
+
+  -- и так далее, для каждого заведения
+
+-- конец транзакции
+(1.8ms)  COMMIT
